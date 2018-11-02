@@ -1,19 +1,23 @@
 <h1>Cocktails#show</h1>
 <p>Find me in app/views/cocktails/show.html.erb</p>
 
-<h2>This are the ingredients for <%= @cocktail.name %>:</h2>
-<ul>
-<% @cocktail.doses.each do |dose| %>
-  <li> <%= dose.description %>
-  <%= cl_image_tag @cocktail.photo, height: 300, width: 400, crop: :fill %>
-  <%= link_to "Delete", cocktail_dose_path(dose), method: 'delete' %>
-  </li>
-  </ul>
+<table>
+  <% @cocktail.doses.each do |dose| %>
+    <% if dose.description == 1 %>
+      <tr><td>1 dose of <%= dose.ingredient.name %></td><td><%= link_to "Delete", cocktail_dose_path(dose), method: :delete, data: { confirm: "Are you sure you want to delete this ingredient from the cocktail?"} %></td></tr>
+    <% else %>
+      <tr><td><%= dose.description %> doses of <%= dose.ingredient.name %></td><td><%= link_to "Delete", cocktail_dose_path(dose), method: :delete, data: { confirm: "Are you sure you want to delete this ingredient from the cocktail?"} %></td></tr>
+    <% end %>
+  <% end %>
+</table>
+
+<%= simple_form_for [@cocktail, @dose], html: { class: "form-inline"} do |f| %>
+  <%= f.input :description, label: "Amount:", required: false, as: :integer, input_html: { style: 'width: 70px'} %>
+  <%= f.association :ingredient, label: "dose(s) of", prompt: "Select an ingredient", collection: Ingredient.order('name ASC'), required: false  %>
+  <%= f.button :submit, name: "commit", value: "Add" %>
 <% end %>
 
+<%= link_to "Delete this cocktail", cocktail_path(@cocktail), method: :delete, data: { confirm: "Are you sure you want to delete this cocktail?"} %>
 
-<%= simple_form_for [@cocktail, @dose] do |c| %>
-  <%= c.input :description %>
-  <%= c.association :ingredients %>
-  <%= c.submit "add a dose", class: "btn btn-primary" %>
-<% end %>
+
+<%= link_to "Go back to overview", root_path %>
